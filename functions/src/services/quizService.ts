@@ -109,7 +109,7 @@ export class QuizService {
       await this.api.sendMessage(userId, texts.courseFinished);
       return;
     }
-    // Delivery re-applies the access rules, so an unpaid user gets the locked text here.
+    // Delivery re-applies the access rules, so an unpaid user gets the paywall here.
     await this.lessonService.deliver(user, lessonNumber + 1);
   }
 

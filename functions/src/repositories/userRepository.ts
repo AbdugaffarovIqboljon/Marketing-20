@@ -1,10 +1,10 @@
 import { Timestamp, type DocumentSnapshot, type Firestore } from "firebase-admin/firestore";
 import type { TelegramProfile, User, UserDocument } from "../models/user";
 
-const USERS_COLLECTION = "users";
+export const USERS_COLLECTION = "users";
 const FIRST_LESSON = 1;
 
-function toUser(snapshot: DocumentSnapshot): User {
+export function toUser(snapshot: DocumentSnapshot): User {
   return { id: Number(snapshot.id), ...(snapshot.data() as UserDocument) };
 }
 

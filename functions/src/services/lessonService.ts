@@ -1,6 +1,7 @@
 import type { Api } from "grammy";
 import * as logger from "firebase-functions/logger";
 import { lessonWatchedKeyboard } from "../bot/keyboards/lessonKeyboards";
+import { paywallKeyboard } from "../bot/keyboards/paymentKeyboards";
 import { config } from "../config/config";
 import { texts } from "../config/texts";
 import { getLesson, lessons, type Lesson } from "../content/lessons";
@@ -57,7 +58,9 @@ export class LessonService {
 
     switch (resolveAccess(user, lessonNumber)) {
       case "locked":
-        await this.api.sendMessage(user.id, texts.lessonLocked(lessonNumber));
+        await this.api.sendMessage(user.id, `${texts.lessonLocked(lessonNumber)}\n\n${texts.paywall}`, {
+          reply_markup: paywallKeyboard(),
+        });
         return undefined;
       case "not_reached":
         await this.api.sendMessage(user.id, texts.lessonNotReached(lessonNumber));

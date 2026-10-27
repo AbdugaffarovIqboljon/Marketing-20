@@ -17,7 +17,7 @@ export function createStartComposer(userService: UserService, lessonService: Les
     // a first-time /start reaches register (and only then is the payload kept).
     const user = ctx.user ?? (await userService.register({ id, firstName, username: username ?? null }, ctx.match));
 
-    await ctx.reply(texts.welcome(user.firstName), { reply_markup: mainMenuKeyboard() });
+    await ctx.reply(texts.welcome(user.firstName), { reply_markup: mainMenuKeyboard(user.paid) });
     await lessonService.deliver(user, user.currentLesson);
   });
 

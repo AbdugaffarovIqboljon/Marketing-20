@@ -6,11 +6,14 @@ export const config = {
   cardNumber: "0000 0000 0000 0000",
   cardHolder: "ISM FAMILIYA",
   supportUsername: "@namuna_support",
-  passPercent: 70,
+  passPercent: 60,
   lessonCount: 20,
   freeLessonCount: 1,
   // Repeated taps on a quiz start button within this window are ignored.
   quizStartDebounceMs: 5_000,
+  // Each open payment gets a unique amount: price + 1..paymentAmountTailMax so'm.
+  paymentAmountTailMax: 999,
+  timeZone: "Asia/Tashkent",
   // Params are resolved at runtime only, so they are exposed as getters.
   get adminGroupId(): number {
     return adminGroupId.value();
