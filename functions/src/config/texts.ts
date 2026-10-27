@@ -1,7 +1,12 @@
+import type { Broadcast, BroadcastAudience } from "../models/broadcast";
+import type { SourceStats, StatsReport } from "../models/stats";
 import { escapeHtml } from "../utils/html";
 import { config } from "./config";
 
 const PROGRESS_BAR_LENGTH = 10;
+const FUNNEL_PER_LINE = 5;
+const NO_SOURCE_LABEL = "(manbasiz)";
+const OTHER_SOURCES_LABEL = "boshqalar";
 
 function formatAmount(amount: number): string {
   return String(amount).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
@@ -23,6 +28,48 @@ export interface AdminReceiptInfo {
 function progressBar(passed: number, total: number): string {
   const filled = Math.min(PROGRESS_BAR_LENGTH, Math.round((passed / total) * PROGRESS_BAR_LENGTH));
   return "▰".repeat(filled) + "▱".repeat(PROGRESS_BAR_LENGTH - filled);
+}
+
+function percent(part: number, total: number): string {
+  return total === 0 ? "0" : ((part / total) * 100).toFixed(1);
+}
+
+function funnelLines(passedByLesson: readonly number[]): string {
+  const cells = passedByLesson.map((count, index) => `${index + 1}: ${count}`);
+  const lines: string[] = [];
+  for (let start = 0; start < cells.length; start += FUNNEL_PER_LINE) {
+    lines.push(cells.slice(start, start + FUNNEL_PER_LINE).join(" · "));
+  }
+  return lines.join("\n");
+}
+
+function sourceLines(sources: readonly SourceStats[]): string {
+  if (sources.length === 0) {
+    return "—";
+  }
+  const top = sources.slice(0, config.statsTopSources);
+  const rest = sources.slice(config.statsTopSources);
+  const lines = top.map((entry) => `${entry.source ?? NO_SOURCE_LABEL}: ${entry.users} / ${entry.paid}`);
+  if (rest.length > 0) {
+    const users = rest.reduce((sum, entry) => sum + entry.users, 0);
+    const paid = rest.reduce((sum, entry) => sum + entry.paid, 0);
+    lines.push(`${OTHER_SOURCES_LABEL}: ${users} / ${paid}`);
+  }
+  return lines.join("\n");
+}
+
+const broadcastAudienceLabels: Record<BroadcastAudience, string> = {
+  all: "Hammaga",
+  unpaid: "To'lamaganlarga",
+  paid: "To'laganlarga",
+};
+
+function broadcastCounters(broadcast: Broadcast): string {
+  return (
+    `✅ Yuborildi: ${broadcast.sent}\n` +
+    `⚠️ Xato: ${broadcast.failed}\n` +
+    `🚫 Bloklagan: ${broadcast.blocked}`
+  );
 }
 
 export const texts = {
@@ -121,6 +168,52 @@ export const texts = {
     `📍 Hozirgi dars: ${currentLesson}-dars`,
 
   help: `Savollaringiz bo'lsa, yordam xizmatiga yozing: ${config.supportUsername}`,
+
+  reminderFirst:
+    `👋 ${config.courseName} kursidagi bepul darsni ko'rdingizmi?\n\n` +
+    `Qolgan darslarni ochish uchun kursni sotib oling. Kurs narxi: ${formatAmount(config.priceUzs)} so'm.`,
+  reminderSecond:
+    `⏳ ${config.courseName} kursi sizni kutmoqda!\n\n` +
+    `To'lovdan so'ng barcha ${config.lessonCount} ta dars va testlar ochiladi. ` +
+    `Savollar bo'lsa, ${config.supportUsername} ga yozing.`,
+
+  stats: (report: StatsReport): string =>
+    `📊 Statistika\n\n` +
+    `👥 Foydalanuvchilar: ${formatAmount(report.totalUsers)}\n` +
+    `🆕 Bugun: ${report.newToday} · 7 kunda: ${report.newLast7Days}\n` +
+    `💳 To'laganlar: ${report.paidUsers} (${percent(report.paidUsers, report.totalUsers)}%)\n` +
+    `💰 Tushum: ${formatAmount(report.revenue)} so'm\n` +
+    `🧾 Tekshiruvda: ${report.pendingPayments} · To'lov kutilmoqda: ${report.awaitingPayments}\n` +
+    `🚫 Bloklaganlar: ${report.blockedUsers}\n\n` +
+    `📚 Darsdan o'tganlar:\n${funnelLines(report.passedByLesson)}\n\n` +
+    `🔗 Manbalar (foydalanuvchi / to'lagan):\n${sourceLines(report.sources)}`,
+
+  broadcastAudience: broadcastAudienceLabels,
+  broadcastConfirmButton: "✅ Yuborish",
+  broadcastCancelButton: "✖️ Bekor qilish",
+  broadcastReplyRequired: "Tarqatmoqchi bo'lgan xabaringizga javob (reply) qilib /broadcast yozing.",
+  broadcastOwnMessage: "Botning o'z xabarini tarqatib bo'lmaydi. Xabarni guruhga o'zingiz yuboring va unga /broadcast bilan javob yozing.",
+  broadcastBusy: "Hozir boshqa tarqatma davom etmoqda. U tugagach, qayta urinib ko'ring.",
+  broadcastChooseAudience: "📣 Bu xabar kimlarga yuborilsin?",
+  broadcastConfirm: (audience: BroadcastAudience, count: number): string =>
+    `📣 Auditoriya: ${broadcastAudienceLabels[audience]}\n` +
+    `Qabul qiluvchilar: ${formatAmount(count)} ta\n\n` +
+    `Yuborishni tasdiqlaysizmi?`,
+  broadcastNoRecipients: (audience: BroadcastAudience): string =>
+    `"${broadcastAudienceLabels[audience]}" bo'yicha qabul qiluvchi yo'q. Boshqa auditoriyani tanlang.`,
+  broadcastQueued: (audience: BroadcastAudience, total: number): string =>
+    `⏳ Tarqatma navbatga qo'yildi: ${broadcastAudienceLabels[audience]}, ${formatAmount(total)} ta qabul qiluvchi.\n` +
+    `Bir daqiqa ichida boshlanadi, jarayon shu xabarda ko'rinadi.`,
+  broadcastStarted: "Tarqatma navbatga qo'yildi.",
+  broadcastCancelled: "Tarqatma bekor qilindi.",
+  broadcastProgress: (broadcast: Broadcast): string =>
+    `📣 Tarqatma davom etmoqda: ${broadcastAudienceLabels[broadcast.audience]}\n\n` +
+    `${broadcastCounters(broadcast)}\n` +
+    `Jami: ${broadcast.sent + broadcast.failed + broadcast.blocked}/${broadcast.total}`,
+  broadcastFinished: (broadcast: Broadcast): string =>
+    `🏁 Tarqatma yakunlandi: ${broadcastAudienceLabels[broadcast.audience]}\n\n${broadcastCounters(broadcast)}`,
+  broadcastAborted: (broadcast: Broadcast): string =>
+    `⛔️ Tarqatma to'xtatildi: asl xabar o'chirilgan.\n\n${broadcastCounters(broadcast)}`,
 
   startRequired: "Boshlash uchun /start buyrug'ini yuboring.",
   unknownMessage: "Tushunmadim. Iltimos, pastdagi menyudan foydalaning.",

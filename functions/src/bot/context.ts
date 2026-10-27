@@ -19,7 +19,14 @@ export function isPrivateChat(ctx: BotContext): boolean {
   return ctx.chat?.type === "private" || ctx.pollAnswer !== undefined;
 }
 
-/** The only group traffic the bot handles: button presses on its messages in the admin group. */
-export function isAdminGroupCallback(ctx: BotContext): boolean {
-  return ctx.callbackQuery?.message?.chat.id === config.adminGroupId;
+/**
+ * The only group traffic the bot looks at: button presses and new messages in
+ * the admin group. The admin composer handles just the pay and broadcast
+ * buttons and the /stats and /broadcast commands; anything else is ignored.
+ */
+export function isAdminGroupUpdate(ctx: BotContext): boolean {
+  return (
+    ctx.callbackQuery?.message?.chat.id === config.adminGroupId ||
+    ctx.message?.chat.id === config.adminGroupId
+  );
 }

@@ -8,8 +8,9 @@ import type { QuizSession } from "../models/quizSession";
 import type { User } from "../models/user";
 import type { QuizSessionRepository } from "../repositories/quizSessionRepository";
 import type { UserRepository } from "../repositories/userRepository";
-import { describeError, isUserUnreachable } from "../utils/errors";
+import { describeError } from "../utils/errors";
 import type { LessonService } from "./lessonService";
+import type { UserService } from "./userService";
 
 function requireQuiz(lessonNumber: number): LessonQuiz {
   const quiz = getQuiz(lessonNumber);
@@ -25,6 +26,7 @@ export class QuizService {
     private readonly sessions: QuizSessionRepository,
     private readonly users: UserRepository,
     private readonly lessonService: LessonService,
+    private readonly userService: UserService,
   ) {}
 
   /** Starts the lesson quiz from its first question, replacing any quiz in progress. */
@@ -114,7 +116,7 @@ export class QuizService {
   }
 
   private async handleFailure(error: unknown, userId: number, lessonNumber: number): Promise<void> {
-    if (isUserUnreachable(error)) {
+    if (await this.userService.markIfUnreachable(userId, error)) {
       logger.warn("Quiz stopped: the user blocked the bot", { userId, lessonNumber });
       return;
     }

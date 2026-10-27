@@ -1,3 +1,4 @@
+import { Timestamp } from "firebase-admin/firestore";
 import type { Api } from "grammy";
 import * as logger from "firebase-functions/logger";
 import { mainMenuKeyboard } from "../bot/keyboards/mainMenuKeyboard";
@@ -7,8 +8,10 @@ import { texts } from "../config/texts";
 import type { Payment, PaymentAdmin, PaymentDecision, Receipt } from "../models/payment";
 import type { User } from "../models/user";
 import type { PaymentRepository } from "../repositories/paymentRepository";
-import { describeError, isUserUnreachable } from "../utils/errors";
+import { describeError } from "../utils/errors";
+import { hoursToMs } from "../utils/time";
 import type { LessonService } from "./lessonService";
+import type { UserService } from "./userService";
 
 function adminCaption(payment: Payment, user: User): string {
   return texts.adminReceiptCaption({
@@ -26,6 +29,7 @@ export class PaymentService {
     private readonly api: Api,
     private readonly payments: PaymentRepository,
     private readonly lessonService: LessonService,
+    private readonly userService: UserService,
   ) {}
 
   async showPaywall(user: User): Promise<void> {
@@ -45,7 +49,10 @@ export class PaymentService {
 
     const payment = await this.payments.openForUser(user.id, config.priceUzs, config.paymentAmountTailMax);
     if (payment === undefined) {
-      logger.error("No free unique payment amount left", { userId: user.id, tailMax: config.paymentAmountTailMax });
+      logger.error("No free payment amount left: every amount is reserved by an open payment", {
+        userId: user.id,
+        tailMax: config.paymentAmountTailMax,
+      });
       await this.api.sendMessage(user.id, texts.paymentUnavailable);
       return;
     }
@@ -126,6 +133,26 @@ export class PaymentService {
     }
   }
 
+  /** Expires awaiting_receipt payments past config.paymentExpiryHours and frees their amounts. Hourly job. */
+  async expireStale(deadline: number): Promise<void> {
+    const before = Timestamp.fromMillis(Date.now() - hoursToMs(config.paymentExpiryHours));
+    let expired = 0;
+    while (Date.now() < deadline) {
+      const ids = await this.payments.findExpirable(before, config.paymentExpiryBatchSize);
+      if (ids.length === 0) {
+        break;
+      }
+      for (const id of ids) {
+        if (await this.payments.expire(id, before)) {
+          expired += 1;
+        }
+      }
+    }
+    if (expired > 0) {
+      logger.info("Stale payments expired", { expired });
+    }
+  }
+
   private async markAdminCard(payment: Payment, user: User, admin: PaymentAdmin): Promise<void> {
     if (payment.adminMessageId === null || payment.decidedAt === null) {
       return;
@@ -151,7 +178,7 @@ export class PaymentService {
       await this.api.sendMessage(user.id, texts.paymentApproved, { reply_markup: mainMenuKeyboard(true) });
       await this.lessonService.deliver(user, user.currentLesson);
     } catch (error) {
-      if (isUserUnreachable(error)) {
+      if (await this.userService.markIfUnreachable(user.id, error)) {
         logger.warn("Payment decision saved, but the user blocked the bot", { userId: user.id, decision });
         return;
       }

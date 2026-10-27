@@ -1,4 +1,5 @@
-import { Timestamp, type DocumentSnapshot, type Firestore } from "firebase-admin/firestore";
+import { FieldPath, Timestamp, type DocumentSnapshot, type Firestore, type Query } from "firebase-admin/firestore";
+import type { BroadcastAudience } from "../models/broadcast";
 import type { TelegramProfile, User, UserDocument } from "../models/user";
 
 export const USERS_COLLECTION = "users";
@@ -40,6 +41,9 @@ export class UserRepository {
         passedLessons: [],
         createdAt: now,
         lastActiveAt: now,
+        blocked: false,
+        blockedAt: null,
+        remindersSent: 0,
       };
       transaction.create(ref, document);
       return { id: profile.id, ...document };
@@ -71,6 +75,96 @@ export class UserRepository {
 
   async updateLastActive(id: number, at: Timestamp): Promise<void> {
     await this.users().doc(String(id)).update({ lastActiveAt: at });
+  }
+
+  /** Stores whether the user blocked the bot; resolves false if the user does not exist. */
+  async setBlocked(id: number, blocked: boolean): Promise<boolean> {
+    const ref = this.users().doc(String(id));
+
+    return this.db.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(ref);
+      if (!snapshot.exists) {
+        return false;
+      }
+      if (toUser(snapshot).blocked !== blocked) {
+        transaction.update(ref, { blocked, blockedAt: blocked ? Timestamp.now() : null });
+      }
+      return true;
+    });
+  }
+
+  async countAudience(audience: BroadcastAudience): Promise<number> {
+    const snapshot = await this.audience(audience).count().get();
+    return snapshot.data().count;
+  }
+
+  /** Next recipients in user-id order, strictly after `afterId`. */
+  async findAudiencePage(audience: BroadcastAudience, afterId: string | null, limit: number): Promise<User[]> {
+    let query = this.audience(audience).orderBy(FieldPath.documentId()).limit(limit);
+    if (afterId !== null) {
+      query = query.startAfter(afterId);
+    }
+    return (await query.get()).docs.map(toUser);
+  }
+
+  /** Unpaid, unblocked users created before `createdBefore` who got exactly `remindersSent` reminders. */
+  async findDueForReminder(
+    remindersSent: number,
+    createdBefore: Timestamp,
+    after: User | null,
+    limit: number,
+  ): Promise<User[]> {
+    let query = this.users()
+      .where("paid", "==", false)
+      .where("blocked", "==", false)
+      .where("remindersSent", "==", remindersSent)
+      .where("createdAt", "<", createdBefore)
+      .orderBy("createdAt")
+      .orderBy(FieldPath.documentId())
+      .limit(limit);
+    if (after !== null) {
+      query = query.startAfter(after.createdAt, String(after.id));
+    }
+    return (await query.get()).docs.map(toUser);
+  }
+
+  /**
+   * Moves remindersSent from `reminder - 1` to `reminder` before the reminder
+   * is sent, so it can never go out twice. Resolves false if the user paid,
+   * blocked the bot or already got it.
+   */
+  async claimReminder(id: number, reminder: number): Promise<boolean> {
+    const ref = this.users().doc(String(id));
+
+    return this.db.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(ref);
+      if (!snapshot.exists) {
+        return false;
+      }
+      const user = toUser(snapshot);
+      if (user.paid || user.blocked || user.remindersSent !== reminder - 1) {
+        return false;
+      }
+      transaction.update(ref, { remindersSent: reminder });
+      return true;
+    });
+  }
+
+  /** Undoes claimReminder when the reminder was not sent, so the next run retries it. */
+  async releaseReminder(id: number, reminder: number): Promise<void> {
+    const ref = this.users().doc(String(id));
+
+    await this.db.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(ref);
+      if (snapshot.exists && toUser(snapshot).remindersSent === reminder) {
+        transaction.update(ref, { remindersSent: reminder - 1 });
+      }
+    });
+  }
+
+  private audience(audience: BroadcastAudience): Query {
+    const reachable = this.users().where("blocked", "==", false);
+    return audience === "all" ? reachable : reachable.where("paid", "==", audience === "paid");
   }
 
   private users() {

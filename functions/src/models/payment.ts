@@ -1,6 +1,6 @@
 import type { Timestamp } from "firebase-admin/firestore";
 
-export type PaymentStatus = "awaiting_receipt" | "pending" | "approved" | "rejected";
+export type PaymentStatus = "awaiting_receipt" | "pending" | "approved" | "rejected" | "expired";
 export type PaymentDecision = Extract<PaymentStatus, "approved" | "rejected">;
 export type ReceiptType = "photo" | "document";
 
@@ -15,7 +15,7 @@ export interface PaymentAdmin {
 export interface Payment {
   readonly id: string;
   readonly userId: number;
-  /** Course price plus a tail unique among open payments, so a transfer can be matched to its user. */
+  /** Course price plus a tail reserved in paymentAmounts while open, so a transfer can be matched to its user. */
   readonly amount: number;
   readonly status: PaymentStatus;
   readonly receiptFileId: string | null;

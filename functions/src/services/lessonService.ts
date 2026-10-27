@@ -6,7 +6,8 @@ import { config } from "../config/config";
 import { texts } from "../config/texts";
 import { getLesson, lessons, type Lesson } from "../content/lessons";
 import type { User } from "../models/user";
-import { describeError, isUserUnreachable } from "../utils/errors";
+import { describeError } from "../utils/errors";
+import type { UserService } from "./userService";
 
 type Access = "granted" | "locked" | "not_reached";
 
@@ -26,7 +27,10 @@ function resolveAccess(user: User, lessonNumber: number): Access {
 }
 
 export class LessonService {
-  constructor(private readonly api: Api) {}
+  constructor(
+    private readonly api: Api,
+    private readonly userService: UserService,
+  ) {}
 
   /** Sends the lesson video, or a user-facing explanation when it cannot be opened. */
   async deliver(user: User, lessonNumber: number): Promise<void> {
@@ -84,7 +88,7 @@ export class LessonService {
   }
 
   private async handleDeliveryFailure(error: unknown, user: User, lessonNumber: number): Promise<void> {
-    if (isUserUnreachable(error)) {
+    if (await this.userService.markIfUnreachable(user.id, error)) {
       logger.warn("Lesson not delivered: the user blocked the bot", { userId: user.id, lessonNumber });
       return;
     }

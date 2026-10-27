@@ -1,4 +1,10 @@
-import { Timestamp, type DocumentSnapshot, type Firestore } from "firebase-admin/firestore";
+import {
+  Timestamp,
+  type DocumentReference,
+  type DocumentSnapshot,
+  type Firestore,
+  type Transaction,
+} from "firebase-admin/firestore";
 import {
   OPEN_PAYMENT_STATUSES,
   type Payment,
@@ -10,7 +16,15 @@ import {
 import type { User } from "../models/user";
 import { toUser, USERS_COLLECTION } from "./userRepository";
 
-const PAYMENTS_COLLECTION = "payments";
+export const PAYMENTS_COLLECTION = "payments";
+/** One document per amount in use, keyed by the amount, so two open payments can never share one. */
+const PAYMENT_AMOUNTS_COLLECTION = "paymentAmounts";
+
+interface AmountReservation {
+  readonly paymentId: string;
+  readonly userId: number;
+  readonly reservedAt: Timestamp;
+}
 
 export type DecisionResult =
   | { readonly kind: "decided"; readonly payment: Payment; readonly user: User }
@@ -34,31 +48,29 @@ export class PaymentRepository {
   }
 
   /**
-   * Returns the user's open payment, or creates one with an amount no other
-   * open payment uses. Resolves to undefined when every amount is taken.
+   * Returns the user's open payment, or creates one with a freshly reserved
+   * amount, preferring the amount of their previous payment. Resolves to
+   * undefined when every amount is taken.
    */
   async openForUser(userId: number, price: number, tailMax: number): Promise<Payment | undefined> {
     return this.db.runTransaction(async (transaction) => {
-      const own = await transaction.get(this.payments().where("userId", "==", userId));
-      const existing = own.docs.map(toPayment).find(isOpen);
+      const own = (await transaction.get(this.payments().where("userId", "==", userId))).docs.map(toPayment);
+      const existing = own.find(isOpen);
       if (existing !== undefined) {
         return existing;
       }
 
-      const open = await transaction.get(this.payments().where("status", "in", OPEN_PAYMENT_STATUSES).select("amount"));
-      const usedAmounts = new Set(open.docs.map((doc) => doc.get("amount") as number));
-      const freeAmounts: number[] = [];
-      for (let tail = 1; tail <= tailMax; tail++) {
-        if (!usedAmounts.has(price + tail)) {
-          freeAmounts.push(price + tail);
-        }
-      }
-      const amount = freeAmounts[Math.floor(Math.random() * freeAmounts.length)];
+      const previous = own.reduce<Payment | undefined>(
+        (latest, payment) => (latest === undefined || payment.createdAt.toMillis() > latest.createdAt.toMillis() ? payment : latest),
+        undefined,
+      );
+      const amount = await this.pickFreeAmount(transaction, price, tailMax, previous?.amount);
       if (amount === undefined) {
         return undefined;
       }
 
       const ref = this.payments().doc();
+      const now = Timestamp.now();
       const document: PaymentDocument = {
         userId,
         amount,
@@ -66,11 +78,14 @@ export class PaymentRepository {
         receiptFileId: null,
         receiptType: null,
         adminMessageId: null,
-        createdAt: Timestamp.now(),
+        createdAt: now,
         decidedAt: null,
         decidedBy: null,
       };
+      const reservation: AmountReservation = { paymentId: ref.id, userId, reservedAt: now };
       transaction.create(ref, document);
+      // create() fails if the amount is already reserved, so a race can never hand out a duplicate.
+      transaction.create(this.amounts().doc(String(amount)), reservation);
       return { id: ref.id, ...document };
     });
   }
@@ -132,8 +147,13 @@ export class PaymentRepository {
         throw new Error(`User ${payment.userId} not found while deciding payment ${paymentId}`);
       }
 
+      const reservation = await this.findReservation(transaction, payment);
+
       const decidedAt = Timestamp.now();
       transaction.update(ref, { status: decision, decidedAt, decidedBy: admin });
+      if (reservation !== undefined) {
+        transaction.delete(reservation);
+      }
       let user = toUser(userSnapshot);
       if (decision === "approved") {
         transaction.update(userRef, { paid: true });
@@ -141,6 +161,72 @@ export class PaymentRepository {
       }
       return { kind: "decided", payment: { ...payment, status: decision, decidedAt, decidedBy: admin }, user };
     });
+  }
+
+  /** Ids of awaiting_receipt payments created before `before`, oldest first. */
+  async findExpirable(before: Timestamp, limit: number): Promise<string[]> {
+    const snapshot = await this.payments()
+      .where("status", "==", "awaiting_receipt")
+      .where("createdAt", "<", before)
+      .orderBy("createdAt")
+      .limit(limit)
+      .select()
+      .get();
+    return snapshot.docs.map((doc) => doc.id);
+  }
+
+  /** Expires the payment and frees its amount; resolves false if it got a receipt or changed meanwhile. */
+  async expire(paymentId: string, before: Timestamp): Promise<boolean> {
+    const ref = this.payments().doc(paymentId);
+
+    return this.db.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(ref);
+      const payment = snapshot.exists ? toPayment(snapshot) : undefined;
+      if (payment?.status !== "awaiting_receipt" || payment.createdAt.toMillis() >= before.toMillis()) {
+        return false;
+      }
+      const reservation = await this.findReservation(transaction, payment);
+      transaction.update(ref, { status: "expired" });
+      if (reservation !== undefined) {
+        transaction.delete(reservation);
+      }
+      return true;
+    });
+  }
+
+  private async pickFreeAmount(
+    transaction: Transaction,
+    price: number,
+    tailMax: number,
+    preferred: number | undefined,
+  ): Promise<number | undefined> {
+    if (preferred !== undefined && preferred > price && preferred <= price + tailMax) {
+      const snapshot = await transaction.get(this.amounts().doc(String(preferred)));
+      if (!snapshot.exists) {
+        return preferred;
+      }
+    }
+
+    const reserved = await transaction.get(this.amounts().select());
+    const usedAmounts = new Set(reserved.docs.map((doc) => Number(doc.id)));
+    const freeAmounts: number[] = [];
+    for (let tail = 1; tail <= tailMax; tail++) {
+      if (!usedAmounts.has(price + tail)) {
+        freeAmounts.push(price + tail);
+      }
+    }
+    return freeAmounts[Math.floor(Math.random() * freeAmounts.length)];
+  }
+
+  /** The payment's amount reservation, if it still belongs to this payment. */
+  private async findReservation(transaction: Transaction, payment: Payment): Promise<DocumentReference | undefined> {
+    const ref = this.amounts().doc(String(payment.amount));
+    const snapshot = await transaction.get(ref);
+    return snapshot.get("paymentId") === payment.id ? ref : undefined;
+  }
+
+  private amounts() {
+    return this.db.collection(PAYMENT_AMOUNTS_COLLECTION);
   }
 
   private payments() {
