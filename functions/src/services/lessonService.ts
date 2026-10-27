@@ -44,27 +44,40 @@ export class LessonService {
     return { passed: user.passedLessons.length, total: config.lessonCount };
   }
 
-  private async sendLesson(user: User, lessonNumber: number): Promise<void> {
+  /**
+   * Applies the lesson access rules. Resolves to the lesson when the user may
+   * open it; otherwise tells the user why and resolves to undefined.
+   */
+  async ensureAccess(user: User, lessonNumber: number): Promise<Lesson | undefined> {
     const lesson = getLesson(lessonNumber);
     if (lesson === undefined) {
       await this.api.sendMessage(user.id, texts.lessonNotFound);
-      return;
+      return undefined;
     }
 
     switch (resolveAccess(user, lessonNumber)) {
       case "locked":
         await this.api.sendMessage(user.id, texts.lessonLocked(lessonNumber));
-        return;
+        return undefined;
       case "not_reached":
         await this.api.sendMessage(user.id, texts.lessonNotReached(lessonNumber));
-        return;
+        return undefined;
       case "granted":
-        await this.api.copyMessage(user.id, config.storageChannelId, lesson.storageMessageId, {
-          caption: texts.lessonLabel(lesson.number, lesson.title),
-          protect_content: true,
-          reply_markup: lessonWatchedKeyboard(lesson.number),
-        });
+        return lesson;
     }
+  }
+
+  private async sendLesson(user: User, lessonNumber: number): Promise<void> {
+    const lesson = await this.ensureAccess(user, lessonNumber);
+    if (lesson === undefined) {
+      return;
+    }
+
+    await this.api.copyMessage(user.id, config.storageChannelId, lesson.storageMessageId, {
+      caption: texts.lessonLabel(lesson.number, lesson.title),
+      protect_content: true,
+      reply_markup: lessonWatchedKeyboard(lesson.number),
+    });
   }
 
   private async handleDeliveryFailure(error: unknown, user: User, lessonNumber: number): Promise<void> {

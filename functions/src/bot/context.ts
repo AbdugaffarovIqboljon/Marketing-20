@@ -13,6 +13,7 @@ export function hasUser(ctx: BotContext): ctx is UserContext {
   return ctx.user !== undefined;
 }
 
+/** poll_answer updates carry no chat, but the bot only sends quiz polls to private chats. */
 export function isPrivateChat(ctx: BotContext): boolean {
-  return ctx.chat?.type === "private";
+  return ctx.chat?.type === "private" || ctx.pollAnswer !== undefined;
 }

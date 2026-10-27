@@ -29,6 +29,18 @@ export const texts = {
   watchedButton: "Ko'rdim, testga o'tish",
   quizComingSoon: "Test tez orada qo'shiladi. Biroz sabr qiling 🙂",
 
+  quizPassed: (correct: number, total: number, percent: number): string =>
+    `✅ Test topshirildi!\n\nTo'g'ri javoblar: ${correct}/${total} (${percent}%).`,
+  quizFailed: (correct: number, total: number, percent: number): string =>
+    `❌ Test topshirilmadi.\n\nTo'g'ri javoblar: ${correct}/${total} (${percent}%). ` +
+    `O'tish uchun kamida ${config.passPercent}% kerak. Darsni yana bir ko'rib, qayta urinib ko'ring.`,
+  retryQuizButton: "Qayta topshirish",
+  courseFinished:
+    `🎉 Tabriklaymiz! Siz ${config.courseName} kursining barcha ${config.lessonCount} ta darsini tugatdingiz.`,
+  quizUnavailable:
+    `Kechirasiz, testni yuborib bo'lmadi. Birozdan so'ng qayta urinib ko'ring. ` +
+    `Muammo davom etsa, ${config.supportUsername} ga yozing.`,
+
   lessonLocked: (number: number): string =>
     `🔒 ${number}-dars yopiq.\n` +
     `Keyingi darslarni ochish uchun kursga to'lov qilish kerak. To'lov bo'limi tez orada qo'shiladi.`,

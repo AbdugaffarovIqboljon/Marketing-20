@@ -46,6 +46,29 @@ export class UserRepository {
     });
   }
 
+  /**
+   * Marks the lesson passed (idempotently) and unlocks the next one, capped at
+   * `lessonCount`. Progress never moves backwards, so retakes are safe.
+   */
+  async recordLessonPassed(id: number, lessonNumber: number, lessonCount: number): Promise<User> {
+    const ref = this.users().doc(String(id));
+
+    return this.db.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(ref);
+      if (!snapshot.exists) {
+        throw new Error(`User ${id} not found while recording lesson ${lessonNumber} as passed`);
+      }
+
+      const user = toUser(snapshot);
+      const passedLessons = user.passedLessons.includes(lessonNumber)
+        ? user.passedLessons
+        : [...user.passedLessons, lessonNumber];
+      const currentLesson = Math.min(lessonCount, Math.max(user.currentLesson, lessonNumber + 1));
+      transaction.update(ref, { passedLessons, currentLesson });
+      return { ...user, passedLessons, currentLesson };
+    });
+  }
+
   async updateLastActive(id: number, at: Timestamp): Promise<void> {
     await this.users().doc(String(id)).update({ lastActiveAt: at });
   }

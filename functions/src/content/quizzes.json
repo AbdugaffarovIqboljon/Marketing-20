@@ -1,0 +1,722 @@
+[
+  {
+    "lessonNumber": 1,
+    "questions": [
+      {
+        "text": "1-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 2,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "1-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "text": "1-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 0
+      }
+    ]
+  },
+  {
+    "lessonNumber": 2,
+    "questions": [
+      {
+        "text": "2-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 3,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "2-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "text": "2-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 1
+      }
+    ]
+  },
+  {
+    "lessonNumber": 3,
+    "questions": [
+      {
+        "text": "3-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 0,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "3-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "text": "3-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 2
+      }
+    ]
+  },
+  {
+    "lessonNumber": 4,
+    "questions": [
+      {
+        "text": "4-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 1,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "4-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "text": "4-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 3
+      }
+    ]
+  },
+  {
+    "lessonNumber": 5,
+    "questions": [
+      {
+        "text": "5-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 2,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "5-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "text": "5-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 0
+      }
+    ]
+  },
+  {
+    "lessonNumber": 6,
+    "questions": [
+      {
+        "text": "6-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 3,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "6-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "text": "6-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 1
+      }
+    ]
+  },
+  {
+    "lessonNumber": 7,
+    "questions": [
+      {
+        "text": "7-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 0,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "7-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "text": "7-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 2
+      }
+    ]
+  },
+  {
+    "lessonNumber": 8,
+    "questions": [
+      {
+        "text": "8-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 1,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "8-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "text": "8-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 3
+      }
+    ]
+  },
+  {
+    "lessonNumber": 9,
+    "questions": [
+      {
+        "text": "9-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 2,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "9-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "text": "9-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 0
+      }
+    ]
+  },
+  {
+    "lessonNumber": 10,
+    "questions": [
+      {
+        "text": "10-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 3,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "10-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "text": "10-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 1
+      }
+    ]
+  },
+  {
+    "lessonNumber": 11,
+    "questions": [
+      {
+        "text": "11-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 0,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "11-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "text": "11-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 2
+      }
+    ]
+  },
+  {
+    "lessonNumber": 12,
+    "questions": [
+      {
+        "text": "12-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 1,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "12-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "text": "12-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 3
+      }
+    ]
+  },
+  {
+    "lessonNumber": 13,
+    "questions": [
+      {
+        "text": "13-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 2,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "13-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "text": "13-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 0
+      }
+    ]
+  },
+  {
+    "lessonNumber": 14,
+    "questions": [
+      {
+        "text": "14-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 3,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "14-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "text": "14-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 1
+      }
+    ]
+  },
+  {
+    "lessonNumber": 15,
+    "questions": [
+      {
+        "text": "15-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 0,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "15-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "text": "15-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 2
+      }
+    ]
+  },
+  {
+    "lessonNumber": 16,
+    "questions": [
+      {
+        "text": "16-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 1,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "16-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "text": "16-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 3
+      }
+    ]
+  },
+  {
+    "lessonNumber": 17,
+    "questions": [
+      {
+        "text": "17-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 2,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "17-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "text": "17-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 0
+      }
+    ]
+  },
+  {
+    "lessonNumber": 18,
+    "questions": [
+      {
+        "text": "18-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 3,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "18-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "text": "18-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 1
+      }
+    ]
+  },
+  {
+    "lessonNumber": 19,
+    "questions": [
+      {
+        "text": "19-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 0,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "19-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "text": "19-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 2
+      }
+    ]
+  },
+  {
+    "lessonNumber": 20,
+    "questions": [
+      {
+        "text": "20-dars, 1-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 1,
+        "explanation": "Namuna izoh: to'g'ri javob darsda tushuntirilgan."
+      },
+      {
+        "text": "20-dars, 2-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "text": "20-dars, 3-savol: namuna savol matni?",
+        "options": [
+          "Variant A",
+          "Variant B",
+          "Variant C",
+          "Variant D"
+        ],
+        "correctIndex": 3
+      }
+    ]
+  }
+]
