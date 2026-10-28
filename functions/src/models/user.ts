@@ -15,6 +15,8 @@ export interface User {
   readonly blockedAt: Timestamp | null;
   /** How many payment reminders were sent (0, 1 or 2); claimed before sending so none repeats. */
   readonly remindersSent: number;
+  /** When reminder 1 was claimed and sent; null until then. Reminder 2 waits reminderMinGapHours after it. */
+  readonly firstReminderSentAt: Timestamp | null;
 }
 
 /** The shape stored in Firestore: the Telegram user id is the document key. */

@@ -14,13 +14,20 @@ interface ReminderStep {
   /** 1 or 2: the value remindersSent takes once this reminder is sent. */
   readonly reminder: number;
   readonly afterHours: number;
+  /** Minimum hours since reminder 1 was sent; null for reminder 1 itself. */
+  readonly minGapHours: number | null;
   readonly text: string;
 }
 
 // The second reminder goes first, so a user who gets the first one in this run cannot also get the second.
 const STEPS: readonly ReminderStep[] = [
-  { reminder: 2, afterHours: config.reminderSecondAfterHours, text: texts.reminderSecond },
-  { reminder: 1, afterHours: config.reminderFirstAfterHours, text: texts.reminderFirst },
+  {
+    reminder: 2,
+    afterHours: config.reminderSecondAfterHours,
+    minGapHours: config.reminderMinGapHours,
+    text: texts.reminderSecond,
+  },
+  { reminder: 1, afterHours: config.reminderFirstAfterHours, minGapHours: null, text: texts.reminderFirst },
 ];
 
 export class ReminderService {
@@ -50,6 +57,8 @@ export class ReminderService {
   /** Resolves false when the run ran out of time before the step was done. */
   private async sendStep(step: ReminderStep, sender: PacedSender): Promise<boolean> {
     const createdBefore = Timestamp.fromMillis(Date.now() - hoursToMs(step.afterHours));
+    const firstSentBefore =
+      step.minGapHours === null ? null : Timestamp.fromMillis(Date.now() - hoursToMs(step.minGapHours));
     const counts = { sent: 0, failed: 0, blocked: 0 };
     let after: User | null = null;
 
@@ -67,6 +76,9 @@ export class ReminderService {
           return false;
         }
         after = user;
+        if (firstSentBefore !== null && !isFirstReminderBefore(user, firstSentBefore)) {
+          continue;
+        }
         if (!(await this.users.claimReminder(user.id, step.reminder))) {
           continue;
         }
@@ -81,4 +93,9 @@ export class ReminderService {
       }
     }
   }
+}
+
+/** True when reminder 1 was sent before `cutoff`; a user who never got it is never due for reminder 2. */
+function isFirstReminderBefore(user: User, cutoff: Timestamp): boolean {
+  return user.firstReminderSentAt !== null && user.firstReminderSentAt.toMillis() < cutoff.toMillis();
 }

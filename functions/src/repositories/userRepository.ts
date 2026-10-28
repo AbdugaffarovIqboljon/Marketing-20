@@ -44,6 +44,7 @@ export class UserRepository {
         blocked: false,
         blockedAt: null,
         remindersSent: 0,
+        firstReminderSentAt: null,
       };
       transaction.create(ref, document);
       return { id: profile.id, ...document };
@@ -130,7 +131,8 @@ export class UserRepository {
 
   /**
    * Moves remindersSent from `reminder - 1` to `reminder` before the reminder
-   * is sent, so it can never go out twice. Resolves false if the user paid,
+   * is sent, so it can never go out twice. Claiming reminder 1 also stamps
+   * firstReminderSentAt. Resolves false if the user paid,
    * blocked the bot or already got it.
    */
   async claimReminder(id: number, reminder: number): Promise<boolean> {
@@ -145,7 +147,10 @@ export class UserRepository {
       if (user.paid || user.blocked || user.remindersSent !== reminder - 1) {
         return false;
       }
-      transaction.update(ref, { remindersSent: reminder });
+      transaction.update(
+        ref,
+        reminder === 1 ? { remindersSent: 1, firstReminderSentAt: Timestamp.now() } : { remindersSent: reminder },
+      );
       return true;
     });
   }
@@ -157,7 +162,10 @@ export class UserRepository {
     await this.db.runTransaction(async (transaction) => {
       const snapshot = await transaction.get(ref);
       if (snapshot.exists && toUser(snapshot).remindersSent === reminder) {
-        transaction.update(ref, { remindersSent: reminder - 1 });
+        transaction.update(
+          ref,
+          reminder === 1 ? { remindersSent: 0, firstReminderSentAt: null } : { remindersSent: reminder - 1 },
+        );
       }
     });
   }

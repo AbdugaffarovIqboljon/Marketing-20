@@ -26,6 +26,8 @@ export const config = {
   hourlyJobBudgetMs: 240_000,
   reminderFirstAfterHours: 24,
   reminderSecondAfterHours: 72,
+  // Reminder 2 also waits this long after reminder 1 was actually sent.
+  reminderMinGapHours: 48,
   // Reminders go out only from reminderFromHour (inclusive) to reminderUntilHour (exclusive), local time.
   reminderFromHour: 10,
   reminderUntilHour: 21,
